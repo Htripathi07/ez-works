@@ -44,17 +44,8 @@ export default function App() {
                 margin: 0,
               }}
             >
-              Task Management UI
+              EZ Works UI
             </h1>
-            <p
-              style={{
-                fontSize: 13,
-                color: "#94A3B8",
-                margin: "2px 0 0",
-              }}
-            >
-              React · TypeScript · HTML5 Drag & Drop
-            </p>
           </div>
 
           {/* Tabs */}

@@ -3,7 +3,7 @@ import type { TreeNode } from "../components/tree/types";
 export const initTree: TreeNode[] = [
   {
     id: "1",
-    name: "Project Root",
+    name: "Full Stack Development",
     loaded: true,
     expanded: true,
     children: [

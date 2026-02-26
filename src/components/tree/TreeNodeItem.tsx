@@ -10,14 +10,6 @@ interface Props {
   onRename: (id: string, name: string) => void;
 }
 
-const LEVEL_COLORS = [
-  { bg: "#4A90D9", letter: "A" },
-  { bg: "#7ED957", letter: "B" },
-  { bg: "#F5A623", letter: "C" },
-  { bg: "#BD10E0", letter: "D" },
-  { bg: "#E74C3C", letter: "E" },
-];
-
 export default function TreeNodeItem({
   node,
   depth,
@@ -29,100 +21,92 @@ export default function TreeNodeItem({
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(node.name);
   const [hovered, setHovered] = useState(false);
+
+  const [addingChild, setAddingChild] = useState(false);
+  const [newChildName, setNewChildName] = useState("");
+  const [error, setError] = useState("");
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const childInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (editing) inputRef.current?.focus();
   }, [editing]);
 
-  const lvl = LEVEL_COLORS[Math.min(depth, LEVEL_COLORS.length - 1)];
-  const INDENT = 52;
+  useEffect(() => {
+    if (addingChild) childInputRef.current?.focus();
+  }, [addingChild]);
 
-  const commit = () => {
-    if (value.trim()) onRename(node.id, value.trim());
+  const INDENT = 28;
+
+  const commitRename = () => {
+    if (value.trim()) {
+      onRename(node.id, value.trim());
+    }
     setEditing(false);
   };
 
-  return (
-    <div style={{ position: "relative", marginBottom: 10 }}>
-      {/* connector lines */}
-      {depth > 0 && (
-        <>
-          <div
-            style={{
-              position: "absolute",
-              left: -INDENT + 20,
-              top: 0,
-              width: 1,
-              height: "100%",
-              borderLeft: "2px dashed #CBD5E1",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              left: -INDENT + 20,
-              top: 27,
-              width: INDENT - 20,
-              height: 1,
-              borderTop: "2px dashed #CBD5E1",
-            }}
-          />
-        </>
-      )}
+  const commitAddChild = () => {
+    if (!newChildName.trim()) {
+      setError("Node name cannot be empty");
+      return;
+    }
 
+    onAdd(node.id, newChildName.trim());
+    setNewChildName("");
+    setAddingChild(false);
+    setError("");
+  };
+
+  return (
+    <div style={{ marginBottom: 10 }}>
+      {/* Row */}
       <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
         style={{
           display: "flex",
           alignItems: "center",
           marginLeft: depth * INDENT,
-          transition: "all 0.2s ease",
+          gap: 8,
         }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
-        {/* badge circle */}
-        <div
+        {/* Expand / Collapse Toggle */}
+        <button
           onClick={() => onToggle(node.id)}
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: "50%",
-            background: lvl.bg,
-            color: "#fff",
+            width: 26,
+            height: 26,
+            borderRadius: 6,
+            border: "none",
+            background: "#E2E8F0",
+            cursor: "pointer",
+            fontWeight: 700,
+            fontSize: 14,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontWeight: 800,
-            fontSize: 15,
-            cursor: "pointer",
-            flexShrink: 0,
-            boxShadow: `0 3px 10px ${lvl.bg}66`,
-            transform: hovered ? "scale(1.1)" : "scale(1)",
-            transition: "transform 0.2s ease",
+            transition: "all 0.2s",
+            transform: hovered ? "scale(1.05)" : "scale(1)",
           }}
         >
-          {node.isLoading ? "..." : lvl.letter}
-        </div>
+          {node.expanded ? "−" : "+"}
+        </button>
 
-        {/* card */}
+        {/* Node Card */}
         <div
           style={{
-            marginLeft: 10,
+            flex: 1,
             background: "#fff",
-            border: "1px solid #E8EDF2",
-            borderLeft: `3px solid ${lvl.bg}`,
             borderRadius: 10,
             padding: "8px 12px",
             display: "flex",
             alignItems: "center",
             gap: 8,
             boxShadow: hovered
-              ? "0 4px 16px rgba(0,0,0,0.10)"
-              : "0 1px 4px rgba(0,0,0,0.06)",
-            flex: 1,
-            minWidth: 0,
-            transition: "all 0.2s ease",
+              ? "0 6px 20px rgba(0,0,0,0.08)"
+              : "0 2px 6px rgba(0,0,0,0.05)",
+            transition: "all 0.2s",
           }}
         >
           {editing ? (
@@ -130,93 +114,177 @@ export default function TreeNodeItem({
               ref={inputRef}
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              onBlur={commit}
+              onBlur={commitRename}
               onKeyDown={(e) => {
-                if (e.key === "Enter") commit();
+                if (e.key === "Enter") commitRename();
                 if (e.key === "Escape") setEditing(false);
               }}
               style={{
-                fontSize: 14,
+                border: "1px solid #CBD5E1",
+                borderRadius: 6,
+                padding: "4px 8px",
                 outline: "none",
-                border: "none",
                 flex: 1,
-                fontWeight: 500,
+                fontSize: 14,
               }}
             />
           ) : (
             <span
               onDoubleClick={() => setEditing(true)}
               style={{
-                fontSize: 14,
-                color: "#1F2937",
                 flex: 1,
+                fontSize: 14,
                 fontWeight: 500,
                 cursor: "text",
-                userSelect: "none",
               }}
             >
               {node.name}
             </span>
           )}
 
-          {/* action buttons */}
+          {/* Actions */}
           <div
             style={{
               display: "flex",
-              gap: 4,
+              gap: 6,
               opacity: hovered ? 1 : 0,
-              transition: "opacity 0.2s ease",
+              transition: "opacity 0.2s",
             }}
           >
             <button
-              onClick={() => onAdd(node.id, "New Node")}
+              onClick={() => setAddingChild(true)}
               style={{
-                width: 24,
-                height: 24,
+                padding: "4px 8px",
                 borderRadius: 6,
-                background: `${lvl.bg}22`,
                 border: "none",
+                background: "#DBEAFE",
                 cursor: "pointer",
-                fontSize: 14,
-                color: lvl.bg,
-                fontWeight: 700,
+                fontSize: 12,
               }}
             >
-              ＋
+              + Add
             </button>
 
             <button
               onClick={() => onDelete(node.id)}
               style={{
-                width: 24,
-                height: 24,
+                padding: "4px 8px",
                 borderRadius: 6,
-                background: "#FEE2E2",
                 border: "none",
+                background: "#FEE2E2",
                 cursor: "pointer",
-                fontSize: 11,
-                color: "#EF4444",
+                fontSize: 12,
               }}
             >
-              ✕
+              Delete
             </button>
           </div>
         </div>
       </div>
 
-      {/* children */}
-      {node.expanded &&
-        node.children.map((child) => (
-          <TreeNodeItem
-            key={child.id}
-            node={child}
-            depth={depth + 1}
-            onToggle={onToggle}
-            onAdd={onAdd}
-            onDelete={onDelete}
-            onRename={onRename}
+      {/* Child Input UI Improved */}
+      {addingChild && (
+        <div
+          style={{
+            marginLeft: (depth + 1) * INDENT,
+            marginTop: 8,
+            background: "#F8FAFC",
+            padding: 10,
+            borderRadius: 10,
+            border: "1px solid #E2E8F0",
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+            maxWidth: 320,
+          }}
+        >
+          <input
+            ref={childInputRef}
+            value={newChildName}
+            onChange={(e) => {
+              setNewChildName(e.target.value);
+              setError("");
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitAddChild();
+              if (e.key === "Escape") {
+                setAddingChild(false);
+                setError("");
+              }
+            }}
+            placeholder="Enter child node name..."
+            style={{
+              padding: "6px 10px",
+              borderRadius: 6,
+              border: error
+                ? "1px solid #EF4444"
+                : "1px solid #CBD5E1",
+              outline: "none",
+              fontSize: 13,
+            }}
           />
-        ))}
+
+          {error && (
+            <span style={{ color: "#EF4444", fontSize: 11 }}>
+              {error}
+            </span>
+          )}
+
+          <div style={{ display: "flex", gap: 6 }}>
+            <button
+              onClick={commitAddChild}
+              style={{
+                padding: "4px 8px",
+                borderRadius: 6,
+                border: "none",
+                background: "#4A90D9",
+                color: "#fff",
+                cursor: "pointer",
+                fontSize: 12,
+              }}
+            >
+              Add
+            </button>
+
+            <button
+              onClick={() => setAddingChild(false)}
+              style={{
+                padding: "4px 8px",
+                borderRadius: 6,
+                border: "none",
+                background: "#E2E8F0",
+                cursor: "pointer",
+                fontSize: 12,
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+{node.expanded && node.children.length > 0 && (
+  <div
+    style={{
+      marginTop: 12, 
+      display: "flex",
+      flexDirection: "column",
+      gap: 8,   
+    }}
+  >
+    {node.children.map((child) => (
+      <TreeNodeItem
+        key={child.id}
+        node={child}
+        depth={depth + 1}
+        onToggle={onToggle}
+        onAdd={onAdd}
+        onDelete={onDelete}
+        onRename={onRename}
+      />
+    ))}
+  </div>
+)}
     </div>
   );
 }
