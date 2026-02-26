@@ -1,73 +1,71 @@
-# React + TypeScript + Vite
+Task Management UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a simple Task Management project built using React + TypeScript + Vite.
 
-Currently, two official plugins are available:
+The project contains:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🌳 Tree View
 
-## React Compiler
+🗂️ Kanban Board
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Add / Delete / Rename functionality
 
-## Expanding the ESLint configuration
+Drag and Drop for Kanban cards
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Responsive layout
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Inline styling (no external CSS framework)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+React
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+TypeScript
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Vite
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Features
+Tree View
+
+Expand / Collapse nodes
+
+Add root and child nodes
+
+Rename nodes (double click)
+
+Delete nodes
+
+Simple validation for empty input
+
+Kanban Board
+
+Add new cards
+
+Move cards between columns
+
+Reorder cards inside same column
+
+Basic drag and drop animation
+
+Project Setup
+
+Install dependencies:
+
+npm install
+
+Run development server:
+
+npm run dev
+
+App runs on:
+
+http://localhost:5173
+Build Project
+npm run build
+Notes
+
+All styling is done using inline styles.
+
+No external UI library is used.
+
+This project was created for practice and learning React + TypeScript concepts.
